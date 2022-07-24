@@ -1,4 +1,4 @@
-from hmack import hmack
+from .hmack import hmack
 from pyds import loadJSON, saveJSON, sort
 from sentence_transformers import SentenceTransformer, util
 import os
