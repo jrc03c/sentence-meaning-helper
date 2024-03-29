@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from numpy import ndarray
 from numpy.random import random
+from pandas import DataFrame
 from pyds import isEqual
 
 from sentence_meaning_helper import SentenceMeaningHelper
@@ -53,14 +54,39 @@ class SentenceMeaningHelperTestCase(TestCase):
     def test_get_similarity(self):
         cache_dir = random_string(8)
         model = SMALLEST_MODEL
-        sentence = "It was the best of times; it was the worst of times."
+        s1 = "From Italy they visited Germany and France."
+        s2 = "God raises my weakness and gives me courage to endure the worst."
         helper = SentenceMeaningHelper(cache_dir, model=model)
-        self.assertGreater(helper.get_similarity(sentence, sentence), 0.99)
-        # self.assertLess(...)
+        self.assertGreater(helper.get_similarity(s1, s1), 0.99)
+        self.assertLess(helper.get_similarity(s1, s2), 0.30)
         shutil.rmtree(cache_dir)
 
     def test_get_similarities(self):
-        pass
+        cache_dir = random_string(8)
+        model = SMALLEST_MODEL
+
+        sentences = [
+            "My favorite food is cake!",
+            "My favorite food is pie!",
+            "It was a dark and stormy night.",
+            "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+        ]
+
+        helper = SentenceMeaningHelper(cache_dir, model=model)
+        similarities = helper.get_similarities(sentences)
+        self.assertTrue(isinstance(similarities, DataFrame))
+        self.assertTrue(similarities.shape[0] == 6)
+        self.assertTrue(similarities.columns[0] == "Sentence 1")
+        self.assertTrue(similarities.columns[1] == "Sentence 2")
+        self.assertTrue(similarities.columns[2] == "Cosine similarity")
+
+        for i in range(0, similarities.shape[0] - 1):
+            self.assertGreater(
+                similarities["Cosine similarity"].values[i],
+                similarities["Cosine similarity"].values[i + 1],
+            )
+
+        shutil.rmtree(cache_dir)
 
     def test_get_n_most_similar_sentences_to_target(self):
         pass

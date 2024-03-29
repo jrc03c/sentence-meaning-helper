@@ -62,9 +62,9 @@ class SentenceMeaningHelper:
                 out["Cosine similarity"].append(self.get_similarity(s1, s2))
 
         return (
-            pd._data_frame(out)
+            pd.DataFrame(out)
             .sort_values(by="Cosine similarity", ascending=False)
-            .reset_index()
+            .reset_index(drop=True)
         )
 
     def get_n_most_similar_sentences_to_target(
@@ -103,7 +103,7 @@ class SentenceMeaningHelper:
             else "Cosine similarity"
         )
 
-        return pd._data_frame(
+        return pd.DataFrame(
             {
                 "Sentence": [v["sentence"] for v in similarities],
                 similarity_column_name: [v["similarity"] for v in similarities],
