@@ -1,7 +1,7 @@
 setup.py
 sentence_meaning_helper/__init__.py
-sentence_meaning_helper/hmack.py
 sentence_meaning_helper/sentence_meaning_helper.py
+sentence_meaning_helper/sha256.py
 sentence_meaning_helper.egg-info/PKG-INFO
 sentence_meaning_helper.egg-info/SOURCES.txt
 sentence_meaning_helper.egg-info/dependency_links.txt

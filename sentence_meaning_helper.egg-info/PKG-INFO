@@ -1,13 +1,9 @@
 Metadata-Version: 2.1
-Name: sentence-meaning-helper
-Version: 0.0.1
+Name: sentence_meaning_helper
+Version: 0.0.2
 Summary: Some tools for getting sentence meanings w/ Sentence-BERT
 Home-page: https://github.com/jrc03c/sentence_meaning_helper
 Author: jrc03c
 Author-email: jrc03c@pm.me
 License: none
-Platform: UNKNOWN
 Classifier: Topic :: Scientific/Engineering :: Mathematics
-
-UNKNOWN
-
