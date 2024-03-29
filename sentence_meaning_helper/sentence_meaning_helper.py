@@ -3,6 +3,7 @@ import os
 import shutil
 
 import pandas as pd
+from numpy import array
 from pyds import sort
 from sentence_transformers import SentenceTransformer, util
 
@@ -24,15 +25,15 @@ class SentenceMeaningHelper:
         self.cache_dir = cache_dir
         self.model = SentenceTransformer(model)
 
-        if not os.path.isdir(self.cache_dir):
+        if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
 
     def get_sentence_embedding(self, sentence):
         hash = sha256(sentence)
         path = self.cache_dir + "/" + hash
 
-        if os.path.isfile(path):
-            return load_json(path)
+        if os.path.exists(path):
+            return array(load_json(path))
 
         vec = self.model.encode(sentence).astype("float32")
         save_json(path, vec.tolist())
@@ -41,7 +42,7 @@ class SentenceMeaningHelper:
     def get_similarity(self, s1, s2):
         s1vec = self.get_sentence_embedding(s1)
         s2vec = self.get_sentence_embedding(s2)
-        return float(util.cos_sim(s1vec, s2vec).item())
+        return float(util.cos_sim(s1vec.tolist(), s2vec.tolist()).item())
 
     def get_similarities(self, sentences, progress=lambda p: p):
         out = {"Sentence 1": [], "Sentence 2": [], "Cosine similarity": []}
