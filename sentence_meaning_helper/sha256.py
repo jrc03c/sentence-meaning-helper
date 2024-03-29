@@ -3,6 +3,10 @@ import hmac
 
 
 def sha256(text):
+    assert (
+        type(text) == str
+    ), "The value passed into the `sha256` function must be a string!"
+
     out = (
         hmac.new(
             bytes(text, "utf-8"),
