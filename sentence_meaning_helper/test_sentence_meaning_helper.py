@@ -89,7 +89,40 @@ class SentenceMeaningHelperTestCase(TestCase):
         shutil.rmtree(cache_dir)
 
     def test_get_n_most_similar_sentences_to_target(self):
-        pass
+        cache_dir = random_string(8)
+        model = SMALLEST_MODEL
+        helper = SentenceMeaningHelper(cache_dir, model=model)
+        n = 3
+        target = "My favorite food is pizza!"
+
+        others = [
+            "It was a dark and stormy night.",
+            "My favorite food is macaroni and cheese!",
+            "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
+            "It is a pleasure to burn.",
+            "My favorite food is cake!",
+            "Call me Ishmael.",
+            "The story so far: in the beginning, the universe was created. This has made a lot of people very angry and been widely regarded as a bad move.",
+            "My favorite food is pie!",
+        ]
+
+        results = helper.get_n_most_similar_sentences_to_target(target, others, n)
+        self.assertTrue(isinstance(results, DataFrame))
+        self.assertTrue(results.shape[0] == n)
+        self.assertTrue(results.columns[0] == "Sentence")
+        self.assertTrue(results.columns[1] == "Cosine similarity")
+        most_similar_sentences = results["Sentence"].values.tolist()
+
+        predicted = [
+            "My favorite food is cake!",
+            "My favorite food is macaroni and cheese!",
+            "My favorite food is pie!",
+        ]
+
+        for sentence in predicted:
+            self.assertTrue(sentence in most_similar_sentences)
+
+        shutil.rmtree(cache_dir)
 
     def test_clear_cache(self):
         pass

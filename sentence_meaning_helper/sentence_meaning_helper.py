@@ -72,7 +72,6 @@ class SentenceMeaningHelper:
         target,
         sentences,
         n,
-        should_only_consider_similarity_magnitude=False,
         progress=lambda p: p,
     ):
         similarities = []
@@ -85,10 +84,6 @@ class SentenceMeaningHelper:
                 continue
 
             similarity = self.get_similarity(target, sentence)
-
-            if should_only_consider_similarity_magnitude:
-                similarity = abs(similarity)
-
             similarities.append({"sentence": sentence, "similarity": similarity})
 
         similarities = sort(
@@ -97,16 +92,10 @@ class SentenceMeaningHelper:
 
         similarities = similarities[:n]
 
-        similarity_column_name = (
-            "Absolute value of cosine similarity"
-            if should_only_consider_similarity_magnitude
-            else "Cosine similarity"
-        )
-
         return pd.DataFrame(
             {
                 "Sentence": [v["sentence"] for v in similarities],
-                similarity_column_name: [v["similarity"] for v in similarities],
+                "Cosine similarity": [v["similarity"] for v in similarities],
             }
         )
 
