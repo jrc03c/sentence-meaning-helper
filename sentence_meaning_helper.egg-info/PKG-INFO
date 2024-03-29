@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: sentence_meaning_helper
-Version: 0.0.2
+Version: 0.0.3
 Summary: Some tools for getting sentence meanings w/ Sentence-BERT
 Home-page: https://github.com/jrc03c/sentence_meaning_helper
 Author: jrc03c

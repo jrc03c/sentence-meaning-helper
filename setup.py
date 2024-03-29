@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="sentence_meaning_helper",
-    version="0.0.2",
+    version="0.0.3",
     description="Some tools for getting sentence meanings w/ Sentence-BERT",
     url="https://github.com/jrc03c/sentence_meaning_helper",
     author="jrc03c",
