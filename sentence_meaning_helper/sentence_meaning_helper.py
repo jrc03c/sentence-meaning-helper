@@ -1,36 +1,49 @@
-from .hmack import hmack
-from pyds import loadJSON, saveJSON, sort
-from sentence_transformers import SentenceTransformer, util
+import json
 import os
-import pandas as pd
 import shutil
+
+import pandas as pd
+from pyds import sort
+from sentence_transformers import SentenceTransformer, util
+
+from .sha256 import sha256
+
+
+def load_json(path):
+    with open(path) as file:
+        return json.loads(file.read())
+
+
+def save_json(path, data):
+    with open(path, "w") as file:
+        file.write(json.dumps(data))
 
 
 class SentenceMeaningHelper:
-    def __init__(self, cacheDir):
-        self.cacheDir = cacheDir
-        self.model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+    def __init__(self, cache_dir, model="paraphrase-MiniLM-L6-v2"):
+        self.cache_dir = cache_dir
+        self.model = SentenceTransformer(model)
 
-        if not os.path.isdir(self.cacheDir):
-            os.makedirs(self.cacheDir)
+        if not os.path.isdir(self.cache_dir):
+            os.makedirs(self.cache_dir)
 
-    def getSentenceEmbedding(self, sentence):
-        macked = hmack(sentence)
-        path = self.cacheDir + "/" + macked
+    def get_sentence_embedding(self, sentence):
+        hash = sha256(sentence)
+        path = self.cache_dir + "/" + hash
 
         if os.path.isfile(path):
-            return loadJSON(path)
+            return load_json(path)
 
         vec = self.model.encode(sentence).astype("float32")
-        saveJSON(path, vec.tolist())
+        save_json(path, vec.tolist())
         return vec
 
-    def getSimilarity(self, s1, s2):
-        s1Vec = self.getSentenceEmbedding(s1)
-        s2Vec = self.getSentenceEmbedding(s2)
-        return float(util.cos_sim(s1Vec, s2Vec).item())
+    def get_similarity(self, s1, s2):
+        s1vec = self.get_sentence_embedding(s1)
+        s2vec = self.get_sentence_embedding(s2)
+        return float(util.cos_sim(s1vec, s2vec).item())
 
-    def getSimilarities(self, sentences, progress=lambda p: p):
+    def get_similarities(self, sentences, progress=lambda p: p):
         out = {"Sentence 1": [], "Sentence 2": [], "Cosine similarity": []}
 
         for i in range(0, len(sentences) - 1):
@@ -45,20 +58,20 @@ class SentenceMeaningHelper:
 
                 out["Sentence 1"].append(s1)
                 out["Sentence 2"].append(s2)
-                out["Cosine similarity"].append(self.getSimilarity(s1, s2))
+                out["Cosine similarity"].append(self.get_similarity(s1, s2))
 
         return (
-            pd.DataFrame(out)
+            pd._data_frame(out)
             .sort_values(by="Cosine similarity", ascending=False)
             .reset_index()
         )
 
-    def getNMostSimilarSentencesToTarget(
+    def get_n_most_similar_sentences_to_target(
         self,
         target,
         sentences,
         n,
-        shouldOnlyConsiderSimilarityMagnitude=False,
+        should_only_consider_similarity_magnitude=False,
         progress=lambda p: p,
     ):
         similarities = []
@@ -70,9 +83,9 @@ class SentenceMeaningHelper:
             if sentence == target:
                 continue
 
-            similarity = self.getSimilarity(target, sentence)
+            similarity = self.get_similarity(target, sentence)
 
-            if shouldOnlyConsiderSimilarityMagnitude:
+            if should_only_consider_similarity_magnitude:
                 similarity = abs(similarity)
 
             similarities.append({"sentence": sentence, "similarity": similarity})
@@ -83,20 +96,20 @@ class SentenceMeaningHelper:
 
         similarities = similarities[:n]
 
-        similarityColumnName = (
+        similarity_column_name = (
             "Absolute value of cosine similarity"
-            if shouldOnlyConsiderSimilarityMagnitude
+            if should_only_consider_similarity_magnitude
             else "Cosine similarity"
         )
 
-        return pd.DataFrame(
+        return pd._data_frame(
             {
                 "Sentence": [v["sentence"] for v in similarities],
-                similarityColumnName: [v["similarity"] for v in similarities],
+                similarity_column_name: [v["similarity"] for v in similarities],
             }
         )
 
-    def clearCache(self):
-        shutil.rmtree(self.cacheDir)
-        os.makedirs(self.cacheDir)
+    def clear_cache(self):
+        shutil.rmtree(self.cache_dir)
+        os.makedirs(self.cache_dir)
         return self
