@@ -42,7 +42,7 @@ The Sentence-BERT model; specifically a `SentenceTransformer` model from the Sen
 
 ## Instance methods
 
-**`get_sentence_embedding(sentence)`**
+**`get_embedding(sentence)`**
 
 Returns the vector representing the embedding of the given sentence string.
 

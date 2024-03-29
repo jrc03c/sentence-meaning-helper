@@ -37,14 +37,14 @@ class SentenceMeaningHelperTestCase(TestCase):
         self.assertTrue(model == helper.model.tokenizer.name_or_path)
         shutil.rmtree(cache_dir)
 
-    def test_get_sentence_embedding(self):
+    def test_get_embedding(self):
         cache_dir = random_string(8)
         model = SMALLEST_MODEL
         sentence = "It was the best of times; it was the worst of times."
         helper = SentenceMeaningHelper(cache_dir, model=model)
-        v1 = helper.get_sentence_embedding(sentence)
-        v2 = helper.get_sentence_embedding(sentence)
-        v3 = helper.get_sentence_embedding("Here's a different sentence!")
+        v1 = helper.get_embedding(sentence)
+        v2 = helper.get_embedding(sentence)
+        v3 = helper.get_embedding("Here's a different sentence!")
         self.assertTrue(type(v1) == ndarray)
         self.assertTrue(type(v2) == ndarray)
         self.assertTrue(isEqual(v1, v2))
@@ -125,4 +125,20 @@ class SentenceMeaningHelperTestCase(TestCase):
         shutil.rmtree(cache_dir)
 
     def test_clear_cache(self):
-        pass
+        cache_dir = random_string(8)
+        model = SMALLEST_MODEL
+        helper = SentenceMeaningHelper(cache_dir, model=model)
+
+        sentences = [
+            "My favorite food is cake!",
+            "My favorite food is macaroni and cheese!",
+            "My favorite food is pie!",
+        ]
+
+        for sentence in sentences:
+            helper.get_embedding(sentence)
+
+        self.assertTrue(len(os.listdir(cache_dir)) == len(sentences))
+        helper.clear_cache()
+        self.assertTrue(len(os.listdir(cache_dir)) == 0)
+        shutil.rmtree(cache_dir)

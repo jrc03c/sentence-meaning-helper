@@ -28,7 +28,7 @@ class SentenceMeaningHelper:
         if not os.path.exists(self.cache_dir):
             os.makedirs(self.cache_dir)
 
-    def get_sentence_embedding(self, sentence):
+    def get_embedding(self, sentence):
         hash = sha256(sentence)
         path = self.cache_dir + "/" + hash
 
@@ -40,8 +40,8 @@ class SentenceMeaningHelper:
         return vec
 
     def get_similarity(self, s1, s2):
-        s1vec = self.get_sentence_embedding(s1)
-        s2vec = self.get_sentence_embedding(s2)
+        s1vec = self.get_embedding(s1)
+        s2vec = self.get_embedding(s2)
         return float(util.cos_sim(s1vec.tolist(), s2vec.tolist()).item())
 
     def get_similarities(self, sentences, progress=lambda p: p):
